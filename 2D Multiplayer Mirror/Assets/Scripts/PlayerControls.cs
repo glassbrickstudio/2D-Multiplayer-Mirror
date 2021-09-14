@@ -81,6 +81,33 @@ public class @PlayerActionControls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Dead"",
+            ""id"": ""70975bd5-f838-491e-8207-b31f7ce09df3"",
+            ""actions"": [
+                {
+                    ""name"": ""New action"",
+                    ""type"": ""Button"",
+                    ""id"": ""c938522f-2404-4033-9910-440a38dd28cf"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""fe2eded1-54f7-415e-95d9-f84cec0ef0c2"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""New action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -89,6 +116,9 @@ public class @PlayerActionControls : IInputActionCollection, IDisposable
         m_Land = asset.FindActionMap("Land", throwIfNotFound: true);
         m_Land_Move = m_Land.FindAction("Move", throwIfNotFound: true);
         m_Land_Jump = m_Land.FindAction("Jump", throwIfNotFound: true);
+        // Dead
+        m_Dead = asset.FindActionMap("Dead", throwIfNotFound: true);
+        m_Dead_Newaction = m_Dead.FindAction("New action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -175,9 +205,46 @@ public class @PlayerActionControls : IInputActionCollection, IDisposable
         }
     }
     public LandActions @Land => new LandActions(this);
+
+    // Dead
+    private readonly InputActionMap m_Dead;
+    private IDeadActions m_DeadActionsCallbackInterface;
+    private readonly InputAction m_Dead_Newaction;
+    public struct DeadActions
+    {
+        private @PlayerActionControls m_Wrapper;
+        public DeadActions(@PlayerActionControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Newaction => m_Wrapper.m_Dead_Newaction;
+        public InputActionMap Get() { return m_Wrapper.m_Dead; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(DeadActions set) { return set.Get(); }
+        public void SetCallbacks(IDeadActions instance)
+        {
+            if (m_Wrapper.m_DeadActionsCallbackInterface != null)
+            {
+                @Newaction.started -= m_Wrapper.m_DeadActionsCallbackInterface.OnNewaction;
+                @Newaction.performed -= m_Wrapper.m_DeadActionsCallbackInterface.OnNewaction;
+                @Newaction.canceled -= m_Wrapper.m_DeadActionsCallbackInterface.OnNewaction;
+            }
+            m_Wrapper.m_DeadActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Newaction.started += instance.OnNewaction;
+                @Newaction.performed += instance.OnNewaction;
+                @Newaction.canceled += instance.OnNewaction;
+            }
+        }
+    }
+    public DeadActions @Dead => new DeadActions(this);
     public interface ILandActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+    }
+    public interface IDeadActions
+    {
+        void OnNewaction(InputAction.CallbackContext context);
     }
 }

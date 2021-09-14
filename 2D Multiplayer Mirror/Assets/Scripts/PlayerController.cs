@@ -22,6 +22,10 @@ public class PlayerController : MonoBehaviour
 
     private AudioSource audiosource;
 
+    private bool isAlive;
+
+
+
 
     private void Awake()
     {
@@ -30,6 +34,7 @@ public class PlayerController : MonoBehaviour
         col = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audiosource = GetComponent<AudioSource>();
     }
 
   
@@ -49,17 +54,11 @@ public class PlayerController : MonoBehaviour
 
 
 
-
-
-
-
-
-
-
     void Start()
     {
         playerActionControls.Land.Jump.performed += _ => Jump();
-        deathSound = (AudioClip)Resources.Load("DeathFail8Bit");
+        deathSound = Resources.Load<AudioClip>("DeathFail8Bit");
+        isAlive = true;
     }
 
 
@@ -146,9 +145,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Enemy")
+        if (other.gameObject.tag == "Enemy" && isAlive)
         {
-
+            isAlive = false;
+            
             StartCoroutine(PlaySound());
             
         }
@@ -160,11 +160,14 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator PlaySound()
     {
+        Debug.Log("corountine call");
         audiosource.clip = deathSound;
         audiosource.Play();
 
         yield return new WaitUntil(() => audiosource.isPlaying == false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        
     
     }
 

@@ -4,7 +4,7 @@ public class GameManager : MonoBehaviour
 {
 
 
-    private static GameManager musicManagerInstance;
+    private static GameManager gameManager;
 
 
 
@@ -12,10 +12,10 @@ public class GameManager : MonoBehaviour
     {
         DontDestroyOnLoad(this);
 
-        if (musicManagerInstance == null)
+        if (gameManager == null)
         {
             Debug.Log("musicInstance is null so");
-            musicManagerInstance = this;
+            gameManager = this;
 
         }
         else
