@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private AudioSource audiosource;
 
     private bool isAlive;
+    
 
 
 
@@ -35,6 +37,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         audiosource = GetComponent<AudioSource>();
+       
     }
 
   
@@ -145,7 +148,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Enemy" && isAlive)
+        if (other.gameObject.CompareTag("Enemy") && isAlive)
         {
             isAlive = false;
             
@@ -163,6 +166,9 @@ public class PlayerController : MonoBehaviour
         Debug.Log("corountine call");
         audiosource.clip = deathSound;
         audiosource.Play();
+
+
+        playerActionControls.Land.Disable();
 
         yield return new WaitUntil(() => audiosource.isPlaying == false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
